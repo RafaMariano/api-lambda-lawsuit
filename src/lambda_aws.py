@@ -37,7 +37,7 @@ def get_process_data(html):
 
     regex_groups = re.search('\s+Processo:\s+(.+?)\s+.+?\s+Classe:\s+(.+?(\s.+?)*)\s+Área:\s+(.+?)'
                              '(\s+(?:(?!Juiz:).+?))*\s+Juiz:\s+(.*)(\s+(?:(?!Valor\sda\sação:).+?))*\s+'
-                             'Valor\sda\sação:\s+(.*)\s+([0-9]+(\.|,*[0-9])*)', process_data)
+                             'Valor\sda\sação:\s+(.+?)\s+([0-9]+(\.|,*[0-9])*)', process_data)
 
     return {'process_number': regex_groups.group(1),
             'class': {
