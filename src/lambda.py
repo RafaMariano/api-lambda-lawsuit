@@ -6,27 +6,29 @@ import magic
 import uuid
 import re
 
-
 BUCKET_NAME = 'data-analysis-files'
 DIR_PATH = 'html-files'
 
 
-def save_html(file_content, file_name):
+def save_html(file_content):
     if magic.from_buffer(file_content, mime=True) != 'text/html':
         raise Exception('File is not HTML type')
 
-    if file_name is None:
-        file_name = str(uuid.uuid4()) + ".html"
-    else:
-        file_name = file_name if file_name.endswith('.html') else file_name + ".html"
+    # if file_name is None:
+    #     file_name = str(uuid.uuid4()) + ".html"
+    # else:
+    #     file_name = file_name if file_name.endswith('.html') else file_name + ".html"
 
     try:
         s3 = boto3.client('s3')
-        file_path = DIR_PATH + "/" + file_name
 
-        response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=file_path)
-        if response.get('KeyCount', 0) > 0:
-            return file_name
+        while True:
+            file_name = str(uuid.uuid4()) + ".html"
+            file_path = DIR_PATH + "/" + file_name
+            response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=file_path)
+
+            if response.get('KeyCount', 0) == 0:
+                break
 
         s3.put_object(Bucket=BUCKET_NAME, Key=file_path, Body=file_content)
 
@@ -94,28 +96,28 @@ def insert_data(html_data):
         raise Exception(e)
 
 
-def exist_id(id):
-    try:
-        dynamodb = boto3.resource('dynamodb')
-        data_analysis_table = dynamodb.Table('data-analysis-html')
-        response = data_analysis_table.query(KeyConditionExpression=Key('html_file_name').eq(id))['Items']
-
-        if len(response) > 0:
-            return response[0]
-        return False
-
-    except Exception as e:
-        raise Exception(e)
+# def exist_id(id):
+#     try:
+#         dynamodb = boto3.resource('dynamodb')
+#         data_analysis_table = dynamodb.Table('data-analysis-html')
+#         response = data_analysis_table.query(KeyConditionExpression=Key('html_file_name').eq(id))['Items']
+#
+#         if len(response) > 0:
+#             return response[0]
+#         return False
+#
+#     except Exception as e:
+#         raise Exception(e)
 
 
 def lambda_handler(event, context):
     try:
         file_content = base64.b64decode(event['content'])
-        id_html = save_html(file_content, event.get('file_name', None))
+        id_html = save_html(file_content)  # , event.get('file_name', None)
 
-        json = exist_id(id_html)
-        if json:
-            return json
+        # json = exist_id(id_html)
+        # if json:
+        #     return json
 
         parsed_html = BeautifulSoup(file_content, features="html.parser")
 
@@ -126,13 +128,11 @@ def lambda_handler(event, context):
                     'last_movement': get_last_move(parsed_html)
                 }}
 
-        insert_data_result = insert_data(json)
-        if insert_data_result:
-            return insert_data_result
-
+        insert_data(json)
         return json
 
     except Exception as e:
         return {'statusCode': 500,
                 'message': str(e)
                 }
+
