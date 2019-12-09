@@ -72,11 +72,11 @@ def get_last_move(html):
     last_move = html.body.find('tbody', attrs={'id': 'tabelaUltimasMovimentacoes'})
     first_element_of_last_move = last_move.find('tr', attrs={'class': 'fundoClaro'})
 
-    regex_groups = re.search('\s*([0-9]+/[0-9]+/[0-9]+)\s*(.*)\s*([^<]*).', first_element_of_last_move.text)
+    regex_groups = re.search('\s*([0-9]+/[0-9]+/[0-9]+)\s*(.*)\s*"*([^<]*[^\n\t\"])', first_element_of_last_move.text)
 
     return {'date': regex_groups.groups(1)[0],
             'movement': regex_groups.groups(1)[1],
-            'info': regex_groups.groups(1)[2].replace('\n', ' ').replace('\t', '').replace('\"', '')
+            'info': regex_groups.groups(1)[2].replace('\n', ' ').replace('  ', ' ')
             }
 
 
