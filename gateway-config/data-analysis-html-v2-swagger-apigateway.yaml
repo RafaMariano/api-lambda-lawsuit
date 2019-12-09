@@ -1,0 +1,39 @@
+---
+swagger: "2.0"
+info:
+  version: "2019-12-08T19:33:01Z"
+  title: "data-analysis-html"
+host: "ij3hepb6ck.execute-api.sa-east-1.amazonaws.com"
+basePath: "/v2"
+schemes:
+- "https"
+paths:
+  /save-html:
+    post:
+      consumes:
+      - "text/html"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+      security:
+      - api_key: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:sa-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:sa-east-1:917775751846:function:save_html/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_templates"
+        httpMethod: "POST"
+        requestTemplates:
+          text/html: "{\n\"content\": \"$input.body\"\n}"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "x-api-key"
+    in: "header"
+x-amazon-apigateway-binary-media-types:
+- "text/html"
