@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "ReponseSaveHtml",
+  "type": "object",
+  "properties": {
+      "html_file_name": {"type":"string"},
+      "data": {
+          "type": "object",
+          "properties": {
+              "process_data": { 
+                  "type": "object",
+                  "properties": {
+                      "process_number": {"type": "string"},
+                      "class": {
+                          "type": "object",
+                          "properties": {
+                              "type":{"type": "string"},
+                              "area":{"type": "string"}
+                           }
+                      },
+                      "judge": {"type": "string"},
+                      "value": {"type": "string"}
+                   }
+               },
+               "process_parts":{
+                  "type": "object",
+                  "properties":{
+                       "Reqte":{
+                           "type": "object",
+                           "properties": {
+                               "name": {"type": "string"},
+                               "Advogad(a/o)": {
+                                   "type": "array",
+                                   "items": {"type":"string"}
+                               }
+                           }
+                       },
+                       "Reqdo":{
+                           "type": "object",
+                           "properties": {
+                               "name": {"type": "string"},
+                               "Advogad(a/o)": {
+                                   "type": "array",
+                                   "items": {"type":"string"}
+                               }
+                           }
+                       }
+                   }
+               },
+               "last_movement":{
+                   "type": "object",
+                   "properties":{
+                        "date": { "type":"string"},
+                        "movement": {"type": "string"},
+                        "info": {"type":"string"}
+                   }
+               }
+          }
+      }
+      
+  }
+    
+}
+                      
